@@ -113,16 +113,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let others = NSRunningApplication.runningApplications(withBundleIdentifier: "de.christianraudzis.deextend")
             .filter { $0.processIdentifier != ProcessInfo.processInfo.processIdentifier }
         if !others.isEmpty {
-            print("Deextend läuft bereits in der Menüleiste.")
+            print("Deextend is already running in the menu bar.")
             NSApp.terminate(nil)
             return
         }
         let args = CommandLine.arguments
         if args.contains("--diagnose") {
             controller.refresh()
-            print("Private Display-Schnittstelle: \(controller.bridge.available ? "verfügbar" : "fehlt")")
+            print("Private display interface: \(controller.bridge.available ? "available" : "unavailable")")
             for d in controller.devices {
-                print("\(d.name) | \(d.builtIn ? "intern" : "extern") | online=\(d.online) active=\(d.active) | \(d.id)")
+                print("\(d.name) | \(d.builtIn ? "built-in" : "external") | online=\(d.online) active=\(d.active) | \(d.id)")
             }
             NSApp.terminate(nil)
         } else if args.contains("--verify-toggle") {
@@ -134,18 +134,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func verifyToggle() async {
         guard let target = controller.external.first(where: { $0.online }), controller.canDisconnect else {
-            print("FAIL: Aktives internes und externes Display erforderlich.")
+            print("FAIL: Active built-in and external displays are required.")
             exit(1)
         }
-        print("TEST: \(target.name) virtuell trennen …")
+        print("TEST: \(target.name) – virtually disconnecting …")
         await controller.toggle(target)
         let disconnected = controller.devices.first { $0.id == target.id }?.online == false
-        print("Extern offline: \(disconnected); intern aktiv: \(controller.canDisconnect)")
+        print("External offline: \(disconnected); built-in active: \(controller.canDisconnect)")
         try? await Task.sleep(nanoseconds: 2_000_000_000)
         let restored = await controller.restoreAll()
         let online = controller.devices.first { $0.id == target.id }?.online == true
-        print("Wieder verbunden: \(online)")
-        if let error = controller.error { print("Fehler: \(error)") }
+        print("Reconnected: \(online)")
+        if let error = controller.error { print("Error: \(error)") }
         // Exit only after the explicit restoration attempt.
         exit(disconnected && restored && online ? 0 : 1)
     }

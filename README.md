@@ -1,85 +1,85 @@
 # Deextend
 
-**Version 0.1.0** · Native macOS-Menüleisten-App für Monitorpausen am USB-C-Hub.
+**Version 0.1.0** · A native macOS menu bar app for pausing external displays while keeping your USB-C hub connected.
 
-Deextend trennt externe Bildschirme virtuell von deinem Mac. So kannst du am Monitor die Eingangsquelle wechseln und auf dem MacBook weiterarbeiten, während der Hub mit seinen anderen Geräten verbunden bleibt.
+Deextend virtually disconnects external displays from your Mac. Switch your monitor to another input and keep working on your MacBook while the hub and its other devices stay connected.
 
-## Funktionen
+## Features
 
-- **Linksklick:** Externe Monitore gemeinsam pausieren oder pausierte Monitore wieder verbinden.
-- **Rechtsklick:** Bedienmenü direkt am Menüleistensymbol öffnen und Monitore einzeln steuern.
-- **Verbindungshinweis:** Eigener kleiner Popup mit „Wieder verbinden“, wenn ein pausierter Monitor erneut angeschlossen wird. Er erscheint auch, wenn der Monitor dabei virtuell getrennt bleibt, und blendet sich nach 20 Sekunden aus.
-- **Deutsch und Englisch:** Automatisch nach macOS-Sprachpräferenz, mit Englisch als Rückfall.
-- **Optionaler Autostart:** Unter „Bei Anmeldung starten“ im Bedienmenü.
+- **Left-click:** Pause external displays together, or reconnect paused displays.
+- **Right-click:** Open controls directly below the menu bar icon and manage individual displays.
+- **Connection popup:** A separate popup with a Reconnect button when a paused display is plugged in again. It also appears if the display stays virtually disconnected, and dismisses itself after 20 seconds.
+- **English and German:** Selected automatically using your macOS language preferences, with English as the fallback.
+- **Optional launch at login:** Enable Launch at login in the controls.
 
-Die Pausenbalken erscheinen innerhalb des Bildschirmsymbols. Das eingebaute Display wird nie deaktiviert; zum Trennen muss das MacBook geöffnet und sein Display aktiv sein. Beim normalen Beenden verbindet Deextend die selbst pausierten Monitore wieder.
+Pause bars appear inside the display icon while display pause is active. The built-in display is never disabled: keep your MacBook open with its display active when disconnecting external displays. Quitting normally reconnects the displays paused by Deextend.
 
-## Voraussetzungen
+## Requirements
 
-- Mac mit Apple Silicon und macOS 13 oder neuer.
-- Aktives eingebautes Display und mindestens ein externer Monitor.
-- Zum Bauen: Xcode oder eine passende Swift-Toolchain; Python 3 für die Tests.
+- An Apple Silicon Mac running macOS 13 or later.
+- An active built-in display and at least one external display.
+- To build: Xcode or a suitable Swift toolchain; Python 3 to run the tests.
 
-Deextend verwendet private macOS-Displayschnittstellen. Ein macOS-Update kann deren Verhalten ändern. Die App ist nicht notarisiert; der lokale Build wird mit einem auf deinem Mac verfügbaren Entwicklerzertifikat signiert.
+Deextend uses private macOS display interfaces. A macOS update may change their behavior. The app is not notarized; local builds are signed with a developer certificate available on your Mac.
 
-## Bauen und starten
+## Build and run
 
 ```sh
 ./scripts/build.sh
 open build/Deextend.app
 ```
 
-Das Build-Skript verwendet standardmäßig eine gültige **Apple Development**-Identität aus dem lokalen Schlüsselbund. Bei mehreren Identitäten oder für ein anderes Zertifikat:
+The build script uses a valid **Apple Development** identity from your local keychain by default. To choose between multiple identities or use a different certificate:
 
 ```sh
-CODE_SIGN_IDENTITY="Name oder SHA-1 deiner Codesigning-Identität" ./scripts/build.sh
+CODE_SIGN_IDENTITY="Your codesigning identity name or SHA-1" ./scripts/build.sh
 ```
 
-Verfügbare Identitäten zeigt `security find-identity -v -p codesigning`. Fehlt das Zertifikat, bricht der Build ab; es gibt keinen automatischen Rückfall auf eine Ad-hoc-Signatur. Die Signatur wird vor dem Kopieren in den Projektordner geprüft.
+Run `security find-identity -v -p codesigning` to list available identities. The build fails if the certificate is unavailable; it never falls back to ad-hoc signing automatically. The signature is verified before copying the app into the project directory.
 
-Für den dauerhaften Einsatz die App nach `~/Applications` oder `/Applications` kopieren und nur diese Kopie starten. Eine laufende Version vor dem Ersetzen regulär beenden.
+For everyday use, copy the app to `~/Applications` or `/Applications` and run only that copy. Quit a running version normally before replacing it.
 
-## Bedienung
+## Usage
 
-1. MacBook geöffnet lassen und den externen Monitor anschließen.
-2. Links auf das Menüleistensymbol klicken, um den externen Bildschirm virtuell zu trennen.
-3. Am Monitor die Eingangsquelle wechseln.
-4. Für die Rückkehr die Mac-Quelle wählen und erneut auf das Symbol oder im Hinweis-Popup auf **Wieder verbinden** klicken.
+1. Keep your MacBook open and connect the external display.
+2. Left-click the menu bar icon to virtually disconnect the external display.
+3. Switch the monitor to another input.
+4. To return, select your Mac's input on the monitor and click the icon again, or choose **Reconnect** in the connection popup.
 
-Die Monitorpause gilt pro Monitor, solange die App läuft. Erstmals angeschlossene andere Monitore werden nicht automatisch pausiert. Bei erneuter Aktivierung durch macOS versucht Deextend, pausierte Monitore wieder zu trennen. Nach drei Versuchen innerhalb einer Minute hält die Automatik an. Die Anschluss-Popups benötigen keine macOS-Mitteilungsrechte.
+Display pause is remembered per display while the app is running. Other displays connected for the first time are not paused automatically. If macOS reactivates a paused display, Deextend attempts to disconnect it again. Automatic retries stop after three attempts within one minute. Connection popups do not require macOS notification permissions.
 
-## Grenzen und Wiederherstellung
+## Limitations and recovery
 
-- Fenster können beim Trennen verschoben werden; ihre ursprünglichen Positionen werden nicht wiederhergestellt.
-- Deextend wechselt keine Monitor-Eingangsquellen und schaltet keine anderen Hub-Geräte ab.
-- AirPlay, DisplayLink und weitere spezielle Displayadapter sind bisher nicht verifiziert. Getestet wurde ein Apple M3 mit macOS 27.2 und Samsung LU28R55; der Popup nach physischem Abziehen und Einstecken wurde am realen Hub bestätigt. Ein vollständiger Schlaf-/Aufwachzyklus ist noch nicht bestätigt.
-- Nach einem Absturz oder erzwungenen Beenden kann ein Monitor getrennt bleiben. Deextend wieder öffnen und **Verbinden** wählen; alternativ den Hub neu verbinden oder macOS neu starten.
-- Bei identischen Monitoren ohne eindeutige Seriennummer kann die Zuordnung nach einem Portwechsel mehrdeutig sein.
+- Windows may move when a display is disconnected; their original positions are not restored.
+- Deextend does not switch monitor inputs or disable other hub devices.
+- AirPlay, DisplayLink, and other specialized display adapters have not been verified. Testing covered an Apple M3 running macOS 27.2 with a Samsung LU28R55. The connection popup after physically unplugging and reconnecting the hub was confirmed on that setup. A complete sleep/wake cycle has not yet been confirmed.
+- A display may remain disconnected after a crash or force quit. Reopen Deextend and choose **Connect**, reconnect the hub, or restart macOS.
+- Identical monitors without unique serial numbers may be difficult to distinguish after changing ports.
 
-Gerätenamen und Wiederherstellungsdaten werden lokal in der Preferences-Domäne `de.christianraudzis.deextend.display-cache` gespeichert. Deextend löst das Ziel vor jeder Änderung gegen die aktuelle Displayliste auf und sendet keine gespeicherte Display-ID ungeprüft an macOS.
+Device names and recovery information are stored locally in the `de.christianraudzis.deextend.display-cache` preferences domain. Before each change, Deextend resolves the target against the current display list rather than passing an unchecked cached display ID to macOS.
 
-## Entwicklung
+## Development
 
 ```sh
 ./scripts/test.sh
 ```
 
-Die Tests prüfen Display-Schutzregeln, Wiederverbinden, physische Anschlussereignisse bei weiterhin offline bleibenden Displays sowie Übersetzungen und Sprachrückfall. Sie ändern die tatsächliche Displaykonfiguration nicht.
+The tests cover display safety rules, reconnection, physical connection events while displays remain offline, translations, and language fallback. They do not change the actual display configuration.
 
-Bei beendeter App sind außerdem Diagnose und ein optionaler Hardwaretest verfügbar:
+With the app closed, read-only diagnostics and an optional hardware test are also available:
 
 ```sh
-# Nur lesen
+# Read-only diagnostics
 build/Deextend.app/Contents/MacOS/Deextend --diagnose
 
-# Trennt den ersten aktiven externen Monitor kurz und verbindet ihn wieder
+# Briefly disconnects the first active external display, then reconnects it
 build/Deextend.app/Contents/MacOS/Deextend --verify-toggle
 ```
 
-Weitere Sprachen werden als `Resources/<Sprachcode>.lproj/Localizable.strings` ergänzt. Dazu die englische Datei kopieren, ihre Werte übersetzen und Schlüssel sowie Formatplatzhalter erhalten. Build und Tests berücksichtigen zusätzliche Sprachverzeichnisse automatisch.
+To add a language, copy the English translation file to `Resources/<language-code>.lproj/Localizable.strings`, translate its values, and preserve the keys and format placeholders. The build and tests pick up additional language directories automatically.
 
-Die Implementierung verwendet CoreGraphics-Konfigurationstransaktionen, dynamisch aufgelöste private SkyLight-Symbole und IOKit-Anschlussereignisse. Hintergrund zu den Schnittstellen: [Apple Display-Konfiguration](https://developer.apple.com/documentation/coregraphics/cgdisplayconfigref) und [MacDisplay](https://github.com/jjongkwann/MacDisplay). Die Implementierung ist eigenständig; fremder App-Quelltext wurde nicht übernommen.
+The implementation uses CoreGraphics configuration transactions, dynamically resolved private SkyLight symbols, and IOKit connection events. Background on these interfaces: [Apple display configuration](https://developer.apple.com/documentation/coregraphics/cgdisplayconfigref) and [MacDisplay](https://github.com/jjongkwann/MacDisplay). The implementation is independent; no source code from other apps was copied.
 
-## Lizenz und Änderungen
+## License and changes
 
-[MIT-Lizenz](LICENSE) · [Changelog](CHANGELOG.md)
+[MIT License](LICENSE) · [Changelog](CHANGELOG.md)

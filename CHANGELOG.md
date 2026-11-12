@@ -4,6 +4,10 @@ All notable changes to Deextend are documented here.
 
 ## [Unreleased]
 
+### Changed
+
+- Standardized project documentation, build messages, diagnostics, and test output on English. English and German app localizations remain available.
+
 ## [0.1.0] - 2026-11-12
 
 Initial source release.

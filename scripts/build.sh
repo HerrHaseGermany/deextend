@@ -3,8 +3,8 @@ set -euo pipefail
 cd "${0:A:h:h}"
 SIGNING_IDENTITY="${CODE_SIGN_IDENTITY:-Apple Development}"
 if ! security find-identity -v -p codesigning | /usr/bin/grep -F -- "$SIGNING_IDENTITY" >/dev/null; then
-    print -u2 "Signierzertifikat nicht verfügbar: $SIGNING_IDENTITY"
-    print -u2 "CODE_SIGN_IDENTITY auf eine gültige Codesigning-Identität setzen."
+    print -u2 "Signing certificate unavailable: $SIGNING_IDENTITY"
+    print -u2 "Set CODE_SIGN_IDENTITY to a valid codesigning identity."
     exit 1
 fi
 STAGING=$(mktemp -d /tmp/deextend-build.XXXXXX)
@@ -26,4 +26,4 @@ ditto --norsrc "$APP" build/Deextend.app
 xattr -cr build/Deextend.app
 # File Provider can immediately re-add Finder metadata inside Documents.
 # The complete staged bundle was verified above, before this transport copy.
-print "Fertig: $PWD/build/Deextend.app"
+print "Built: $PWD/build/Deextend.app"
